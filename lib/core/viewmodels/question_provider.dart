@@ -16,6 +16,8 @@ class QuestionProvider extends ChangeNotifier {
   bool _finish = false;
   bool get finish => _finish;
 
+  bool _change = false;
+
   Question _question;
   Question get question => _question;
 
@@ -45,7 +47,21 @@ class QuestionProvider extends ChangeNotifier {
     });
 
     // Countdown listener
-    sub.onData((Duration d) {
+    sub.onData((Duration d) async {
+
+      // Saat timer berjalan setiap 5 detik
+      // akan otomatis generate soal baru
+      // jika belum terjawab dan wrong + 1
+      if (d.inSeconds % 5 == 0) {
+        _change = true;
+        generate();
+      } else {
+        if (_change == true) {
+          _change = false;
+          _result.wrong += 1;
+        }
+      }
+      
       _duration = d;
       notifyListeners();
     });
